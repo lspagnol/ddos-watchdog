@@ -39,11 +39,11 @@ while true ; do
 	else
 		logtail ${watchdog_file} |grep -E "${FILTER}" > ${watchdog_temp}
 	fi
-	cnxs=$(cat ${watchdog_temp} |wc -l)
+	count=$(cat ${watchdog_temp} |wc -l)
 
-	echo -n "cnxs=${cnxs},max=${TRIGGER} "
+	echo -n "count=${count},max=${TRIGGER} "
 
-	if [ ${cnxs} -le ${TRIGGER} ] ; then # RAS
+	if [ ${count} -le ${TRIGGER} ] ; then # RAS
 
 		echo ok
 
@@ -90,7 +90,7 @@ while true ; do
 				for mail_dest in ${MAIL_DESTS} ; do
 					echo "To: ${mail_dest}"
 				done
-				echo "Subject: DDOS WARNING: cnxs=${cnxs}, max=${TRIGGER}, period=${PERIOD}s, acces restricted for ${BLOCKING_DURATION} minutes"
+				echo "Subject: DDOS WARNING: count=${count}, max=${TRIGGER}, period=${PERIOD}s, acces restricted for ${BLOCKING_DURATION} minutes"
 				echo
 				cat /tmp/_var_log_nginx_access.log
 			} |sendmail ${MAIL_DESTS}
