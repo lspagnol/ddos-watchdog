@@ -1,8 +1,8 @@
 ###################################################################
-# Fichier de logs à surveiller
+# Fichier de log à surveiller
 LOG_FILE=/var/log/nginx/access.log
 
-# FACULTATIF: regexp de filtrage des lignes de logs (attention simple-quotes obligatoire)
+# FACULTATIF: regexp de filtrage supplémentaire (attention simple-quotes obligatoire), ignoré si vide
 #FILTER='^.* HTTP/(1|2)\.(0|1)" 403 '
 
 ###################################################################
