@@ -92,7 +92,7 @@ while true ; do
 				done
 				echo "Subject: DDOS WARNING: count=${count}, max=${TRIGGER}, period=${PERIOD}s, acces restricted for ${BLOCKING_DURATION} minutes"
 				echo
-				cat /tmp/_var_log_nginx_access.log
+				cat ${watchdog_temp}
 			} |sendmail ${MAIL_DESTS}
 
 		fi
