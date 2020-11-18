@@ -86,12 +86,14 @@ for proto in v4 v6 ; do
 		v4)
 			if [ "${ENABLE_IPV4}" = "1" ] ; then
 				url=${DL_URL_IPV4}
+				lan=${LAN_IPV4}
 				family=inet
 			fi
 		;;
 		v6)
 			if [ "${ENABLE_IPV6}" = "1" ] ; then
 				url=${DL_URL_IPV6}
+				lan=${LAN_IPV6}
 				family=inet6
 			fi
 		;;
@@ -106,11 +108,15 @@ for proto in v4 v6 ; do
 
 			echo ok
 
-			if [ "${proto}" = "v4" ] ; then
-				echo "10.0.0.0/8" >> /tmp/zone_${proto}.download
-			fi
+			# Ajout des blocs d'adresses LAN
+			for bloc in ${lan} ; do
+				echo ${bloc} >> /tmp/zone_${proto}.download
+			done
+
+			# Trier la liste à appliquée
 			cat /tmp/zone_${proto}.download |sort > ${watchdog_dir}/zone_${proto}.download
 
+			# Liste actuelle (triée)
 			ipset list Whitelist-IP${proto} |egrep -v '^[A-Z]' |sort > ${watchdog_dir}/zone_${proto}.netfilter
 
 			diff ${watchdog_dir}/zone_${proto}.netfilter ${watchdog_dir}/zone_${proto}.download > ${watchdog_dir}/zone_${proto}.diff

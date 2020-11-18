@@ -6,7 +6,7 @@ DDOS Watchdog est un démon destiné à protéger les serveurs des attaques DDOS
 - Démarrage du démon: téléchargement et mise à jour de listes blanches (blocs d'adresses IPv4 et IPv6)
 - Mise en place d'un lien symbolique vers le fichier de logs à surveiller
 - Si le nombre de lignes dépasse le seuil autorisé sur la période définie:
-  - des règles Netfilter sont insérées pour n'autoriser que le trafic provenant de des listes blanches,
+  - des règles Netfilter sont insérées pour n'autoriser que le trafic provenant du LAN et des listes blanches,
   - le déblocage automatique est planifié,
   - un mail d'alerte est envoyé.
 
@@ -48,13 +48,24 @@ ENABLE_IPV4=1
 ENABLE_IPV6=1
 
 ###################################################################
-# URLs de téléchargement des blocs d'adresses
+# Définition des blocs d'adresses en liste blanche
+URLs de téléchargement des blocs d'adresses
 
 # IPv4
+
+# URLs de téléchargement des blocs d'adresses
 DL_URL_IPV4='https://www.ipdeny.com/ipblocks/data/countries/fr.zone'
 
+# Blocs à ajouter à la liste
+LAN_IPV4="10.0.0.0/8"
+
 # IPv6
+
+# URLs de téléchargement des blocs d'adresses
 DL_URL_IPV6='https://www.ipdeny.com/ipv6/ipaddresses/blocks/fr.zone'
+
+# Blocs à ajouter à la liste
+LAN_IPV6="fe80::/10"
 
 ###################################################################
 # Divers
