@@ -49,22 +49,17 @@ ENABLE_IPV6=1
 
 ###################################################################
 # Définition des blocs d'adresses en liste blanche
-URLs de téléchargement des blocs d'adresses
 
-# IPv4
-
-# URLs de téléchargement des blocs d'adresses
+# URL de téléchargement des blocs d'adresses IPv4
 DL_URL_IPV4='https://www.ipdeny.com/ipblocks/data/countries/fr.zone'
 
-# Blocs à ajouter à la liste
+# Blocs IPv4 à ajouter à la liste
 LAN_IPV4="10.0.0.0/8"
 
-# IPv6
-
-# URLs de téléchargement des blocs d'adresses
+# URL de téléchargement des blocs d'adresses IPv6
 DL_URL_IPV6='https://www.ipdeny.com/ipv6/ipaddresses/blocks/fr.zone'
 
-# Blocs à ajouter à la liste
+# Blocs IPv6 à ajouter à la liste
 LAN_IPV6="fe80::/10"
 
 ###################################################################
