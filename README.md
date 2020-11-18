@@ -5,8 +5,8 @@ DDOS Watchdog est un démon destiné à protéger les serveurs des attaques DDOS
 # Principe de fonctionnement:
 - Démarrage du démon: téléchargement et mise à jour de listes blanches (blocs d'adresses IPv4 et IPv6)
 - Mise en place d'un lien symbolique vers le fichier de logs à surveiller
-- Si le nombre de lignes dépasse le seuil autorisé:
-  - une règle Netfilter est insérée pour n'autoriser que le trafic provenant de des listes blanches,
+- Si le nombre de lignes dépasse le seuil autorisé sur la période définie:
+  - des règles Netfilter sont insérées pour n'autoriser que le trafic provenant de des listes blanches,
   - le déblocage automatique est planifié,
   - un mail d'alerte est envoyé.
 
