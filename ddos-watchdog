@@ -124,6 +124,7 @@ for proto in v4 v6 ; do
 
 			echo -n "Register IP${proto} blocks ... "
 
+			ipset list -n Whitelist-IP${proto} 2>/dev/null >/dev/null
 			if [ ${?} -ne 0 ] ; then
 				echo "Create ipset 'Whitelist-IP${proto}'"
 				ipset create Whitelist-IP${proto} hash:net family ${family}
