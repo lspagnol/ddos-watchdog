@@ -113,27 +113,31 @@ for proto in v4 v6 ; do
 				echo ${bloc} >> /tmp/zone_${proto}.download
 			done
 
-			# Trier la liste à appliquée
+			# Trier la liste à appliquer
 			cat /tmp/zone_${proto}.download |sort > ${watchdog_dir}/zone_${proto}.download
 
 			# Liste actuelle (triée)
 			ipset list Whitelist-IP${proto} |egrep -v '^[A-Z]' |sort > ${watchdog_dir}/zone_${proto}.netfilter
 
+			# Différence entre la liste à appliquer et la liste appliquée
 			diff ${watchdog_dir}/zone_${proto}.netfilter ${watchdog_dir}/zone_${proto}.download > ${watchdog_dir}/zone_${proto}.diff
 			touch ${watchdog_dir}/zone_${proto}.diff
 
-			echo -n "Register IP${proto} blocks ... "
-
+			# Création des listes ipset
 			ipset list -n Whitelist-IP${proto} 2>/dev/null >/dev/null
 			if [ ${?} -ne 0 ] ; then
 				echo "Create ipset 'Whitelist-IP${proto}'"
 				ipset create Whitelist-IP${proto} hash:net family ${family}
 			fi
 
+			echo -n "Upgrade IP${proto} blocks ... "
+
+			# Ajout
 			cat ${watchdog_dir}/zone_${proto}.diff |grep "^>" |awk '{print $2}' |while read b ; do
 	                	ipset add Whitelist-IP${proto} ${b}
 	                done
 
+			# Suppression
 			cat ${watchdog_dir}/zone_${proto}.diff |grep "^<" |awk '{print $2}' |while read b ; do
 	                	ipset del Whitelist-IP${proto} ${b}
 	                done
