@@ -1,0 +1,104 @@
+#!/bin/bash
+
+source /usr/local/ddos-watchdog/etc/ddos-watchdog.conf || exit 1
+
+###################################################################################
+# Initialisation
+###################################################################################
+
+watchdog_dir=/var/lib/ddos-watchdog
+mkdir -p /var/lib/ddos-watchdog
+
+watchdog_file=${watchdog_dir}/${LOG_FILE//\//_}
+ln -fs ${LOG_FILE} ${watchdog_file}
+
+watchdog_temp=/tmp/ddos-watchdog${LOG_FILE//\//_}
+
+if [ "${1}" = "test" ] ; then
+	DEBUG=2
+fi
+
+###################################################################################
+# Boucle principale
+###################################################################################
+
+# Initialiser l'index logtail
+logtail ${watchdog_file} 2>/dev/null > ${watchdog_temp}
+if [ ${?} -ne 0 ] ; then
+	echo "ERROR: '${watchdog_file}' is unavailable"
+	exit
+fi
+
+# Boucle
+while true ; do
+
+	# Compter le nombre de connexions
+
+	if [ "${FILTER}" = "" ] ; then
+		logtail ${watchdog_file} > ${watchdog_temp}
+	else
+		logtail ${watchdog_file} |grep -E "${FILTER}" > ${watchdog_temp}
+	fi
+	cnxs=$(cat ${watchdog_temp} |wc -l)
+
+	echo -n "cnxs=${cnxs},max=${TRIGGER} "
+
+	if [ ${cnxs} -le ${TRIGGER} ] ; then # RAS
+
+		echo ok
+
+	else # Seuil dépassé
+
+		echo WARNING
+
+		if [ "${DEBUG}" = "" ] || [ "${DEBUG}" = "0" ] ; then
+
+			# Mise en place blocage / IPv4		
+			if [ "${ENABLE_IPV4}" = "1" ] ; then
+
+				iptables -C Services-IN -m set ! --match-set Whitelist-IPv4 src -j DROP 2>/dev/null >/dev/null
+				if [ ${?} -ne 0 ] ; then
+					iptables -I Services-IN -m set ! --match-set Whitelist-IPv4 src -j DROP
+				fi
+
+				# Planification déblocage / IPv4
+				echo "iptables -D Services-IN -m set ! --match-set Whitelist-IPv4 src -j DROP" |at now + ${BLOCKING_DURATION} minute >/dev/null
+
+			fi
+
+			# Mise en place blocage / IPv6
+			if [ "${ENABLE_IPV6}" = "1" ] ; then
+
+				ip6tables -C Services-IN -m set ! --match-set Whitelist-IPv6 src -j DROP 2>/dev/null >/dev/null
+				if [ ${?} -ne 0 ] ; then
+					ip6tables -I Services-IN -m set ! --match-set Whitelist-IPv6 src -j DROP
+				fi
+				
+				# Planification déblocage / IPv6
+				echo "ip6tables -D Services-IN -m set ! --match-set Whitelist-IPv6 src -j DROP" |at now + ${BLOCKING_DURATION} minute >/dev/null
+
+			fi
+
+		fi
+
+		if [ "${DEBUG}" = "" ] || [ "${DEBUG}" = "0" ] || [ "${DEBUG}" = "1" ] ; then
+
+			# Mail d'alerte
+			{
+				echo "Content-Type: text/plain; charset=utf-8; format=flowed"
+				echo "Content-Transfer-Encoding: 8bit"
+				for mail_dest in ${MAIL_DESTS} ; do
+					echo "To: ${mail_dest}"
+				done
+				echo "Subject: DDOS WARNING: cnxs=${cnxs}, max=${TRIGGER}, period=${PERIOD}s, acces restricted for ${BLOCKING_DURATION} minutes"
+				echo
+				cat /tmp/_var_log_nginx_access.log
+			} |sendmail ${MAIL_DESTS}
+
+		fi
+
+	fi
+
+	sleep ${PERIOD}
+
+done

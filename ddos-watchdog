@@ -1,0 +1,193 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:          ddos-watchdog
+# Required-Start:    $local_fs $remote_fs $network $syslog $named
+# Required-Stop:     $local_fs $remote_fs $network $syslog $named
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: DDOS watchdog daemon
+# Description:       starts ddos-watchdog daemon
+### END INIT INFO
+
+###################################################################################
+
+source /usr/local/ddos-watchdog/etc/ddos-watchdog.conf || exit 1
+
+###################################################################################
+# Initialisation
+###################################################################################
+
+watchdog_dir=/var/lib/ddos-watchdog
+mkdir -p /var/lib/ddos-watchdog
+
+watchdog_file=${watchdog_dir}/${LOG_FILE//\//_}
+ln -fs ${LOG_FILE} ${watchdog_file}
+
+watchdog_temp=/tmp/${LOG_FILE//\//_}
+
+###################################################################################
+# Fonctions
+###################################################################################
+
+# Etat du démon
+function get_pid {
+ps awx |grep ' /bin/bash /usr/local/ddos-watchdog/sbin/ddos-watchdog.daemon' |grep -v grep |awk '{print $1}'
+}
+
+# Démarrage du démon
+function daemon_start {
+
+pid=$(get_pid)
+
+if [ "${pid}" = "" ] ; then
+	echo -n "Starting ddos-watchdog ... "
+	/usr/local/ddos-watchdog/sbin/ddos-watchdog.daemon 2>/dev/null |logger -t ddos-watchdog & >/dev/null 2>/dev/null </dev/null
+	pid=$(get_pid)
+	if [ "${pid}" = "" ] ; then
+		echo "fail"
+	else
+		echo "running, pid ${pid}"
+	fi
+else
+	echo "ddos-watchdog is already running, pid ${pid}"
+fi
+
+}
+
+# Arrêt du démon
+function daemon_stop {
+
+pid=$(get_pid)
+
+if [ "${pid}" = "" ] ; then
+	echo "ddos-watchdog is already stopped"
+else
+	echo -n "Stopping ddos-watchdog ... "
+	kill ${pid}
+	pid=$(get_pid)
+	if [ "${pid}" = "" ] ; then
+		echo "success"
+	else
+		echo "fail"
+	fi
+fi
+
+}
+
+# MAJ des blocs d'adresses IP
+function block_update {
+
+for proto in v4 v6 ; do
+
+	unset url
+
+	case ${proto} in
+		v4)
+			if [ "${ENABLE_IPV4}" = "1" ] ; then
+				url=${DL_URL_IPV4}
+				family=inet
+			fi
+		;;
+		v6)
+			if [ "${ENABLE_IPV6}" = "1" ] ; then
+				url=${DL_URL_IPV6}
+				family=inet6
+			fi
+		;;
+	esac
+
+	if [ ! -z "${url}" ] ; then
+
+		echo -n "Download IP${proto} blocks ... "
+		wget --no-check-certificate -O /tmp/zone_${proto}.download "${url}" 2>/dev/null >/dev/null
+
+		if [ ${?} -eq 0 ] ; then
+
+			echo ok
+
+			if [ "${proto}" = "v4" ] ; then
+				echo "10.0.0.0/8" >> /tmp/zone_${proto}.download
+			fi
+			cat /tmp/zone_${proto}.download |sort > ${watchdog_dir}/zone_${proto}.download
+
+			ipset list Whitelist-IP${proto} |egrep -v '^[A-Z]' |sort > ${watchdog_dir}/zone_${proto}.netfilter
+
+			diff ${watchdog_dir}/zone_${proto}.netfilter ${watchdog_dir}/zone_${proto}.download > ${watchdog_dir}/zone_${proto}.diff
+			touch ${watchdog_dir}/zone_${proto}.diff
+
+			echo -n "Register IP${proto} blocks ... "
+
+			if [ ${?} -ne 0 ] ; then
+				echo "Create ipset 'Whitelist-IP${proto}'"
+				ipset create Whitelist-IP${proto} hash:net family ${family}
+			fi
+
+			cat ${watchdog_dir}/zone_${proto}.diff |grep "^>" |awk '{print $2}' |while read b ; do
+	                	ipset add Whitelist-IP${proto} ${b}
+	                done
+
+			cat ${watchdog_dir}/zone_${proto}.diff |grep "^<" |awk '{print $2}' |while read b ; do
+	                	ipset del Whitelist-IP${proto} ${b}
+	                done
+	                
+	        fi
+	        
+	        echo ok
+	        
+	else
+		echo fail
+	fi
+
+done
+
+}
+
+###################################################################################
+
+case ${1} in
+
+	reload)
+		block_update
+	;;
+
+	start)
+		block_update
+		daemon_start
+	;;
+
+	stop)
+		daemon_stop
+	;;
+
+	restart)
+		daemon_stop
+		block_update
+		daemon_start
+	;;
+
+	status)
+		echo -n "ddos-watchdog is "
+		pid=$(get_pid)
+		if [ "${pid}" = "" ] ; then
+			echo "stopped"
+		else
+			echo "running, pid ${pid}"
+		fi
+	;;
+
+	test)
+		pid=$(get_pid)
+		if [ "${pid}" = "" ] ; then
+			/usr/local/ddos-watchdog/sbin/ddos-watchdog.daemon test
+		else
+			echo "ddos-watchdog must be stopped"
+		fi
+	;;		
+
+	*)
+		echo "Usage: ddos-watchdog test|status|reload|start|stop|restart"
+		echo
+	;;
+
+esac

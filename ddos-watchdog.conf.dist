@@ -1,0 +1,43 @@
+###################################################################
+# Fichier de logs à surveiller
+LOG_FILE=/var/log/nginx/access.log
+
+# FACULTATIF: regexp de filtrage des logs (attention simple-quotes obligatoire)
+#FILTER='^.* HTTP/(1|2)\.(0|1)" 403 '
+
+###################################################################
+# Configuration de l'analyse et du blocage
+
+# Délai d'attente entre deux analyses (secondes)
+PERIOD=10
+
+# Nombre max de connexions pendant la période
+TRIGGER=2000
+
+# Durée du blocage (minutes)
+BLOCKING_DURATION=30
+
+# Activer le blocage pour ces protocoles
+ENABLE_IPV4=1
+ENABLE_IPV6=1
+
+###################################################################
+# URLs de téléchargement des blocs d'adresses
+
+# IPv4
+DL_URL_IPV4='https://www.ipdeny.com/ipblocks/data/countries/fr.zone'
+
+# IPv6
+DL_URL_IPV6='https://www.ipdeny.com/ipv6/ipaddresses/blocks/fr.zone'
+
+###################################################################
+# Divers
+
+# Destinataires mail d'alerte
+MAIL_DESTS="dest1@domaine1.fr dest2@domaine2.fr"
+
+# Mode DEBUG
+# 0: fonctionnement normal
+# 1: alerte mail uniquement, pas de mise en place du blocage
+# 2: pas d'alerte mail ni de blocage
+DEBUG=0
