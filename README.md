@@ -25,10 +25,11 @@ update-rc.d -f ddos-watchdog defaults
 # Configuration
 Editer le fichier */usr/local/ddos-watchdog/etc/ddos-watchdog.conf*:
 ```
-# Fichier de logs à surveiller
+###################################################################
+# Fichier de log à surveiller
 LOG_FILE=/var/log/nginx/access.log
 
-# FACULTATIF: regexp de filtrage des logs (attention simple-quotes obligatoire)
+# FACULTATIF: regexp de filtrage supplémentaire (attention simple-quotes obligatoire), ignoré si vide
 #FILTER='^.* HTTP/(1|2)\.(0|1)" 403 '
 
 # Commandes iptables "normales"
@@ -47,7 +48,7 @@ IPT6="/sbin/ip6tables -w"
 # Délai d'attente entre deux analyses (secondes)
 PERIOD=10
 
-# Nombre max de connexions pendant la période
+# Nombre max de lignes pendant la période
 TRIGGER=2000
 
 # Durée du blocage (minutes)
