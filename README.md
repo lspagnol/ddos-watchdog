@@ -31,6 +31,16 @@ LOG_FILE=/var/log/nginx/access.log
 # FACULTATIF: regexp de filtrage des logs (attention simple-quotes obligatoire)
 #FILTER='^.* HTTP/(1|2)\.(0|1)" 403 '
 
+# Commandes iptables "normales"
+IPT4="/sbin/iptables -w"
+IPT6="/sbin/ip6tables -w"
+
+# Commandes iptables "sérialisées"
+# A utiliser si un processus modifie les règles netfilter en arrière plan
+# en utilisant "task-spooler" 
+#IPT4="/usr/bin/tsp -nf /sbin/iptables"
+#IPT6="/usr/bin/tsp -nf /sbin/ip6tables"
+
 ###################################################################
 # Configuration de l'analyse et du blocage
 

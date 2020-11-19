@@ -56,26 +56,26 @@ while true ; do
 			# Mise en place blocage / IPv4		
 			if [ "${ENABLE_IPV4}" = "1" ] ; then
 
-				iptables -C Services-IN -m set ! --match-set Whitelist-IPv4 src -j DROP 2>/dev/null >/dev/null
+				$IPT4 -C Services-IN -m set ! --match-set Whitelist-IPv4 src -j DROP 2>/dev/null >/dev/null
 				if [ ${?} -ne 0 ] ; then
-					iptables -I Services-IN -m set ! --match-set Whitelist-IPv4 src -j DROP
+					$IPT4 -I Services-IN -m set ! --match-set Whitelist-IPv4 src -j DROP
 				fi
 
 				# Planification déblocage / IPv4
-				echo "iptables -D Services-IN -m set ! --match-set Whitelist-IPv4 src -j DROP" |at now + ${BLOCKING_DURATION} minute >/dev/null
+				echo "$IPT4 -D Services-IN -m set ! --match-set Whitelist-IPv4 src -j DROP" |at now + ${BLOCKING_DURATION} minute >/dev/null
 
 			fi
 
 			# Mise en place blocage / IPv6
 			if [ "${ENABLE_IPV6}" = "1" ] ; then
 
-				ip6tables -C Services-IN -m set ! --match-set Whitelist-IPv6 src -j DROP 2>/dev/null >/dev/null
+				$IPT6 -C Services-IN -m set ! --match-set Whitelist-IPv6 src -j DROP 2>/dev/null >/dev/null
 				if [ ${?} -ne 0 ] ; then
-					ip6tables -I Services-IN -m set ! --match-set Whitelist-IPv6 src -j DROP
+					$IPT6 -I Services-IN -m set ! --match-set Whitelist-IPv6 src -j DROP
 				fi
 				
 				# Planification déblocage / IPv6
-				echo "ip6tables -D Services-IN -m set ! --match-set Whitelist-IPv6 src -j DROP" |at now + ${BLOCKING_DURATION} minute >/dev/null
+				echo "$IPT6 -D Services-IN -m set ! --match-set Whitelist-IPv6 src -j DROP" |at now + ${BLOCKING_DURATION} minute >/dev/null
 
 			fi
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for p in at iptables ipset logtail ; do
+for p in at iptables ipset logtail task-spooler ; do
 	dpkg -l ${p} 2>/dev/null >/dev/null || apt -y install ${p}
 done
 
