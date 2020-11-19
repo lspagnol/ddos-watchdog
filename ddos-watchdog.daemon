@@ -24,10 +24,6 @@ fi
 
 # Initialiser l'index logtail
 logtail ${watchdog_file} 2>/dev/null > ${watchdog_temp}
-if [ ${?} -ne 0 ] ; then
-	echo "ERROR: '${watchdog_file}' is unavailable"
-	exit
-fi
 
 # Boucle
 while true ; do
