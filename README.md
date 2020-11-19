@@ -1,6 +1,6 @@
 # ddos-watchdog
 
-DDOS Watchdog est un démon destiné à protéger les serveurs des attaques DDOS
+DDOS Watchdog est un démon destiné à protéger les serveurs des attaques DDOS basées sur des requêtes valides et anodines.
 
 # Principe de fonctionnement:
 - Démarrage du démon: téléchargement et mise à jour de listes blanches (blocs d'adresses IPv4 et IPv6)
@@ -14,8 +14,7 @@ DDOS Watchdog est un démon destiné à protéger les serveurs des attaques DDOS
 ```
 git clone https://github.com/lspagnol/ddos-watchdog
 cd ddos-watchdog
-chmod +x install.sh
-./install.sh
+bash install.sh
 ```
 Pour activer le démon au démarrage du serveur:
 ```
