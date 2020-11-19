@@ -4,6 +4,7 @@ DDOS Watchdog est un démon destiné à protéger les serveurs des attaques DDOS
 
 # Principe de fonctionnement:
 - Démarrage du démon: téléchargement et mise à jour de listes blanches (blocs d'adresses IPv4 et IPv6)
+  - l'activité du démon est consignée dans syslog (syslog-tag *ddos-watchdog*)
 - Mise en place d'un lien symbolique vers le fichier de logs à surveiller
 - Si le nombre de lignes dépasse le seuil autorisé sur la période définie:
   - des règles Netfilter sont insérées pour n'autoriser que le trafic provenant du LAN et des listes blanches,
@@ -22,7 +23,7 @@ update-rc.d -f ddos-watchdog defaults
 ```
 
 # Configuration
-Editer le fichier */usr/local/ddos-watchdog/ddos-watchdog.conf*:
+Editer le fichier */usr/local/ddos-watchdog/etc/ddos-watchdog.conf*:
 ```
 # Fichier de logs à surveiller
 LOG_FILE=/var/log/nginx/access.log

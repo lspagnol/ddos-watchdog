@@ -45,5 +45,5 @@ MAIL_DESTS="dest1@domaine1.fr dest2@domaine2.fr"
 # Mode DEBUG
 # 0: fonctionnement normal
 # 1: alerte mail uniquement, pas de mise en place du blocage
-# 2: pas d'alerte mail ni de blocage
+# 2: pas d'alerte mail ni de blocage (permet de surveiller l'activité dans Syslog)
 DEBUG=0
