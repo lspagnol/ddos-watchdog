@@ -210,7 +210,7 @@ case ${1} in
 	;;
 
 	*)
-		echo "Usage: ddos-watchdog test|status|reload|start|stop|restart"
+		echo "Usage: ddos-watchdog test|status|reload|start|stop|restart|flush"
 		echo
 	;;
 
