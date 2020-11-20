@@ -204,8 +204,8 @@ case ${1} in
 		fi
 		$IPT6 -C Services-IN -m set ! --match-set Whitelist-IPv6 src -j DROP 2>/dev/null >/dev/null
 		if [ ${?} -eq 0 ] ; then
-			echo "Remove IPv6 acces restrictions
-			$IPT6 -D Services-IN -m set ! --match-set Whitelist-IPv6 src -j DROP"
+			echo "Remove IPv6 acces restrictions"
+			$IPT6 -D Services-IN -m set ! --match-set Whitelist-IPv6 src -j DROP
 		fi
 	;;
 
