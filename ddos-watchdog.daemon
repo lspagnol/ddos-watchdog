@@ -75,29 +75,32 @@ while true ; do
 		# Mise en place du blocage
 		if [ "${DEBUG}" = "" ] || [ "${DEBUG}" = "0" ] ; then
 
-			# Mise en place blocage / IPv4		
+			# Blocage / IPv4		
 			if [ "${ENABLE_IPV4}" = "1" ] ; then
 
+				# On vérifie si le blocage est déjà en place
 				$IPT4 -C Services-IN -m set ! --match-set Whitelist-IPv4 src -j DROP 2>/dev/null >/dev/null
 				if [ ${?} -ne 0 ] ; then
+					# Mise en place du blocage
 					$IPT4 -I Services-IN -m set ! --match-set Whitelist-IPv4 src -j DROP
+					# Planification du déblocage
+					echo "$IPT4 -D Services-IN -m set ! --match-set Whitelist-IPv4 src -j DROP" |at now + ${BLOCKING_DURATION} minute >/dev/null
 				fi
 
-				# Planification déblocage / IPv4
-				echo "$IPT4 -D Services-IN -m set ! --match-set Whitelist-IPv4 src -j DROP" |at now + ${BLOCKING_DURATION} minute >/dev/null
 
 			fi
 
-			# Mise en place blocage / IPv6
+			# Blocage / IPv6
 			if [ "${ENABLE_IPV6}" = "1" ] ; then
 
+				# On vérifie si le blocage est déjà en place
 				$IPT6 -C Services-IN -m set ! --match-set Whitelist-IPv6 src -j DROP 2>/dev/null >/dev/null
 				if [ ${?} -ne 0 ] ; then
+					# Mise en place du blocage
 					$IPT6 -I Services-IN -m set ! --match-set Whitelist-IPv6 src -j DROP
+					# Planification du déblocage
+					echo "$IPT6 -D Services-IN -m set ! --match-set Whitelist-IPv6 src -j DROP" |at now + ${BLOCKING_DURATION} minute >/dev/null
 				fi
-				
-				# Planification déblocage / IPv6
-				echo "$IPT6 -D Services-IN -m set ! --match-set Whitelist-IPv6 src -j DROP" |at now + ${BLOCKING_DURATION} minute >/dev/null
 
 			fi
 
