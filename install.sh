@@ -11,11 +11,11 @@ chmod +x ddos-watchdog
 mkdir -p /usr/local/ddos-watchdog/sbin
 mkdir -p /usr/local/ddos-watchdog/etc
 
-[ -f /usr/local/ddos-watchdog/etc/ddos-watchdog.conf ] || cp ddos-watchdog.conf.dist /usr/local/ddos-watchdog/etc/ddos-watchdog.conf
-
+cp ddos-watchdog /usr/local/ddos-watchdog/sbin
 cp ddos-watchdog.daemon /usr/local/ddos-watchdog/sbin
 cp ddos-watchdog /etc/init.d
-cp ddos-watchdog /usr/local/ddos-watchdog/sbin
+cp ddos-watchdog.conf.dist /usr/local/ddos-watchdog/etc/
+[ -f /usr/local/ddos-watchdog/etc/ddos-watchdog.conf ] || cp ddos-watchdog.conf.dist /usr/local/ddos-watchdog/etc/ddos-watchdog.conf
 
 ln -fs /usr/local/ddos-watchdog/sbin/ddos-watchdog /usr/local/sbin
 
