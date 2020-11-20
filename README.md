@@ -1,6 +1,6 @@
 # ddos-watchdog
 
-DDOS Watchdog est un démon destiné à protéger les serveurs des attaques DDOS basées sur des requêtes valides et anodines.
+DDOS Watchdog est un démon destiné à protéger les serveurs des attaques DDOS basées sur des requêtes valides et *anodines*.
 
 # Principe de fonctionnement:
 - Démarrage du démon: téléchargement et mise à jour de listes blanches (blocs d'adresses IPv4 et IPv6)
